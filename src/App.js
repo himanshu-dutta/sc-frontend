@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+// Context
+import UserProvider from "./Context/UserContext";
+import ChatboxProvider from "./Context/ChatboxContext";
+
+// Components
+import Landing from "./Components/Landing";
+import Chatbox from "./Components/Chatbox";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div
+      className="App"
+      style={{
+        maxWidth: "500px",
+        margin: "auto",
+        marginTop: "50px",
+      }}
+    >
+      <UserProvider>
+        <Landing />
+        <br />
+        <hr height={5} />
+        <br />
+        <ChatboxProvider>
+          <Chatbox />
+        </ChatboxProvider>
+      </UserProvider>
     </div>
   );
 }
