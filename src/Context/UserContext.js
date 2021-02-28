@@ -4,69 +4,78 @@ import axios from "axios";
 export const UserContext = React.createContext();
 
 const UserProvider = ({ children }) => {
-  const [credentials, setCredentials] = useState({
-    token: "",
-    expiry: "",
-  });
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState({
-    username: "",
-    password: "",
-  });
-
-  const loginUser = ({ username, password }) => {
-    axios
-      .post(`http://${process.env.REACT_APP_API_URL}/api/login/`, {
-        username,
-        password,
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          setIsLoggedIn(!isLoggedIn);
-          const { token, expiry } = response.data;
-          setCredentials({ token: token, expiry: expiry });
-        }
-      });
-    setUser({
-      username: "",
-      password: "",
+    const [credentials, setCredentials] = useState({
+        token: "",
+        expiry: "",
     });
-  };
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const logoutUser = () => {
-    const headers = {
-      Authorization: `Token ${credentials.token}`,
+    const loginUser = ({ username, password }) => {
+        axios
+            .post(`http://${process.env.REACT_APP_API_URL}/api/user/login/`, {
+                username,
+                password,
+            })
+            .then((response) => {
+                console.log(response.data);
+                if (response.status === 200) {
+                    setIsLoggedIn(!isLoggedIn);
+                    const { token, expiry } = response.data;
+                    setCredentials({ token: token, expiry: expiry });
+                }
+            });
     };
 
-    (isLoggedIn &&
-      axios
-        .post(
-          `http://${process.env.REACT_APP_API_URL}/api/logout/`,
-          {},
-          {
-            headers,
-          }
-        )
-        .then((response) => {
-          console.log(response.status);
-        })) ||
-      console.log("User isn't logged in.");
-  };
+    const registerUser = (registrationDetails) => {
+        return axios
+            .post(
+                `http://${process.env.REACT_APP_API_URL}/api/user/register/`,
+                registrationDetails
+            )
+            .then((response) => {
+                if (response.status === 200) {
+                    return true;
+                }
+                return false;
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    };
 
-  return (
-    <UserContext.Provider
-      value={{
-        credentials,
-        isLoggedIn,
-        loginUser,
-        logoutUser,
-        user,
-        setUser,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
-  );
+    const logoutUser = () => {
+        const headers = {
+            Authorization: `Token ${credentials.token}`,
+        };
+
+        (isLoggedIn &&
+            axios
+                .post(
+                    `http://${process.env.REACT_APP_API_URL}/api/user/logout/`,
+                    {},
+                    {
+                        headers,
+                    }
+                )
+                .then((response) => {
+                    console.log(response.status);
+                })) ||
+            console.log("User isn't logged in.");
+    };
+
+    return (
+        <UserContext.Provider
+            value={{
+                credentials,
+                isLoggedIn,
+                loginUser,
+                logoutUser,
+                registerUser,
+            }}
+        >
+            {children}
+        </UserContext.Provider>
+    );
 };
 
 export default UserProvider;
